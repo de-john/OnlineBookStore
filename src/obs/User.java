@@ -5,8 +5,8 @@ import java.util.*;
 
 public class User
 {
- private int userid;
- private String uname;
+ private int userId;
+ private String userName;
  private String pwd;
  private String email;
  private String address;
@@ -15,13 +15,13 @@ public class User
  private boolean logged = false;
 
  public int getUserid()
- { return userid; }
+ { return userId; }
 
- public void setUname(String uname)
- { this.uname = uname; }
+ public void setUname(String userName)
+ { this.userName = userName; }
 
- public String getUname()
- { return uname; }
+ public String getUserName()
+ { return userName; }
 
  public void setPwd(String pwd)
  { this.pwd= pwd; }
@@ -52,20 +52,20 @@ public class User
  public void login()
  {
  Connection con = null;
- PreparedStatement ps = null;
+ PreparedStatement prepStatement = null;
  try
  {
  con = getConnection();
- ps = con.prepareStatement("select userid,email,phone,address from users where uname = ? and pwd= ?");
- ps.setString(1,uname);
- ps.setString(2,pwd);
+ prepStatement = con.prepareStatement("select userId,email,phone,address from users where userName = ? and pwd= ?");
+ prepStatement.setString(1,userName);
+ prepStatement.setString(2,pwd);
 
- ResultSet rs = ps.executeQuery();
+ ResultSet rs = prepStatement.executeQuery();
 
  logged = false;
 
  if ( rs.next())
- { userid = rs.getInt("userid");
+ { userId = rs.getInt("userid");
  email = rs.getString("email");
  address = rs.getString("address");
  phone = rs.getString("phone");
@@ -79,7 +79,7 @@ public class User
  }
  finally
  {
- clean(con,ps);
+ clean(con,prepStatement);
  } 
 
  } // end of isValid
@@ -89,7 +89,7 @@ public class User
  public String updateProfile(String newpwd) 
  {
  Connection con = null;
- PreparedStatement ps= null;
+ PreparedStatement prepStatement= null;
 
  try
  {
@@ -99,15 +99,15 @@ public class User
  if (! newpwd.equals(""))
  cmd += " , pwd = '" + newpwd + "'";
  
- cmd = cmd + " where userid = ?";
+ cmd = cmd + " where userId = ?";
 
- ps = con.prepareStatement(cmd);
- ps.setString(1,email);
- ps.setString(2,phone);
- ps.setString(3,address);
- ps.setInt(4,userid);
+ prepStatement = con.prepareStatement(cmd);
+ prepStatement.setString(1,email);
+ prepStatement.setString(2,phone);
+ prepStatement.setString(3,address);
+ prepStatement.setInt(4,userId);
 
- int cnt = ps.executeUpdate();
+ int cnt = prepStatement.executeUpdate();
  if ( cnt==1 ) 
  {
  if ( ! newpwd.equals("") )
@@ -125,7 +125,7 @@ public class User
  }
  finally
  {
- clean(con,ps);
+ clean(con,prepStatement);
  } 
 
  } // end of updateProfile
@@ -135,20 +135,20 @@ public class User
  public String registerUser()
  {
  Connection con = null;
- PreparedStatement ps = null;
+ PreparedStatement prepStatement = null;
 
  try
  {
  con = getConnection();
- userid = getNextUserid(con);
- ps = con.prepareStatement("insert into users values (?,?,?,?,?,?)");
- ps.setInt(1,userid);
- ps.setString(2,uname);
- ps.setString(3,pwd);
- ps.setString(4,email);
- ps.setString(5,address);
- ps.setString(6,phone);
- ps.executeUpdate();
+ userId = getNextUserid(con);
+ prepStatement = con.prepareStatement("insert into users values (?,?,?,?,?,?)");
+ prepStatement.setInt(1,userId);
+ prepStatement.setString(2,userName);
+ prepStatement.setString(3,pwd);
+ prepStatement.setString(4,email);
+ prepStatement.setString(5,address);
+ prepStatement.setString(6,phone);
+ prepStatement.executeUpdate();
  logged = true;
  return null;
  }
@@ -157,7 +157,7 @@ public class User
  return ex.getMessage();
  }
  finally
- { clean(con,ps); }
+ { clean(con,prepStatement); }
  }
 
  public boolean isLogged()
@@ -183,10 +183,10 @@ public class User
  }
  
  
- public void clean(Connection con, PreparedStatement ps)
+ public void clean(Connection con, PreparedStatement prepStatement)
  { 
  try
- { if ( ps != null ) ps.close();
+ { if ( prepStatement != null ) prepStatement.close();
  if ( con != null) con.close();
  }
  catch(Exception ex)
@@ -201,4 +201,4 @@ public class User
  return con;
  } 
 
-} // 
+}

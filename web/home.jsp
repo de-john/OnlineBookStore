@@ -36,7 +36,7 @@
     <tr style="font:700 11pt verdana;background-color:green;color:white">
         <td>
             Welcome <b>
-            <jsp:getProperty name="user" property="uname"/>
+            <jsp:getProperty name="user" property="userName"/>
         </b>
     </tr>
 

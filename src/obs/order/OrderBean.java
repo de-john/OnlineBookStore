@@ -15,7 +15,7 @@ public class OrderBean implements SessionBean {
   public void ejbRemove()   {}    // end of remove
 
   public void ejbPassivate() {}
-  public void setSessionContext(SessionContext ctx) {}
+  public void setSessionContext(SessionContext context) {}
 
   public void ejbCreate  () throws CreateException {}
 
@@ -24,26 +24,26 @@ public class OrderBean implements SessionBean {
   {
     Connection con=null;
     String orderID;
-    PreparedStatement ps=null;
+    PreparedStatement prepStatement=null;
 
     try
     {
 
-       Context  ctx  = new InitialContext();
-       DataSource ds = (DataSource) ctx.lookup("oracle");
-       con =ds.getConnection();
-       
+       Context  context  = new InitialContext();
+       DataSource dataSource = (DataSource) context.lookup("oracle");
+       con =dataSource.getConnection();
+
        // get highest order id + 1 for this order
-       ps= con.prepareStatement("select orderID.nextval from dual");
-       ResultSet  rs= ps.executeQuery();
+       prepStatement= con.prepareStatement("select orderID.nextval from dual");
+       ResultSet  rs= prepStatement.executeQuery();
        rs.next();
-       
+
        orderID = rs.getString(1);
 
        rs.close();
 
        // get total amount
-       
+
        int totamt =0;
        Item item;
 
@@ -55,79 +55,79 @@ public class OrderBean implements SessionBean {
        }
 
 
-       ps = con.prepareStatement("insert into orders values(?,?,sysdate,?,'n')");
-       ps.setString(1,orderID);
-       ps.setInt(2,userID);
-       ps.setInt(3,totamt);
-      
-       ps.executeUpdate();
-       ps.close();
+       prepStatement = con.prepareStatement("insert into orders values(?,?,sysdate,?,'n')");
+       prepStatement.setString(1,orderID);
+       prepStatement.setInt(2,userID);
+       prepStatement.setInt(3,totamt);
+
+       prepStatement.executeUpdate();
+       prepStatement.close();
 
        // insert into orderitems
 
-       ps = con.prepareStatement("insert into orderitem values(?,?,?,?)");
+       prepStatement = con.prepareStatement("insert into orderitem values(?,?,?,?)");
 
        itr = items.iterator();
        while ( itr.hasNext())
        {
              item = (Item) itr.next();
-             ps.setString(1,orderID);
-             ps.setString(2, item.getIsbn());
-             ps.setInt(3,item.getPrice());
-             ps.setInt(4,item.getQty());
+             prepStatement.setString(1,orderID);
+             prepStatement.setString(2, item.getIsbn());
+             prepStatement.setInt(3,item.getPrice());
+             prepStatement.setInt(4,item.getQty());
 
-             ps.executeUpdate();
+             prepStatement.executeUpdate();
        }
 
-      
+
        return orderID;
-       
+
     }
     catch(Exception ex)
     {
        ex.printStackTrace();
     }
     finally
-    {  
+    {
       try
-      {  if (ps != null ) ps.close();
+      {  if (prepStatement != null ) prepStatement.close();
          if (con != null) con.close();
       }
       catch(Exception ex) {}
-    }     
+    }
     return null;
 
   } // end of addOrder
 
 
 
-  public boolean cancelOrder(int orderID) 
+  public boolean cancelOrder(int orderID)
   {
     Connection con=null;
-    PreparedStatement ps=null;
+    PreparedStatement prepStatement=null;
 
     try
     {
 
-       Context  ctx  = new InitialContext();
-       DataSource ds = (DataSource) ctx.lookup("oracle");
-       con =ds.getConnection();
+       Context  context  = new InitialContext();
+       DataSource dataSource = (DataSource) context.lookup("oracle");
+       con =dataSource.getConnection();
 
        // delete from ORDERITEM table
        
-       ps = con.prepareStatement("delete from orderitem where orderID = ?");
-       ps.setInt(1,orderID);
+       prepStatement = con.prepareStatement("delete from orderitem where orderID = ?");
+       prepStatement.setInt(1,orderID);
            
-       ps.executeUpdate();
-       ps.close();
+       prepStatement.executeUpdate();
+       prepStatement.close();
 
        // delete from ORDERS table
 
-       ps = con.prepareStatement("delete from orders where orderID = ?");
-       ps.setInt(1,orderID);
+       prepStatement = con.prepareStatement("delete from orders where orderID = ?");
+       prepStatement.setInt(1,orderID);
            
-       int cnt = ps.executeUpdate();
-       ps.close();
+       int cnt = prepStatement.executeUpdate();
+       prepStatement.close();
 
         return cnt == 1;
       
@@ -140,7 +140,7 @@ public class OrderBean implements SessionBean {
     finally
     {  
       try
-      {  if (ps != null ) ps.close();
+      {  if (prepStatement != null ) prepStatement.close();
          if (con != null) con.close();
       }
       catch(Exception ex) {

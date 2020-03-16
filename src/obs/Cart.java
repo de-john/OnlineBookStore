@@ -18,14 +18,14 @@ public class Cart
    
    public Item find(String isbn)
    {
-     Iterator itr = items.iterator();
-     Item itm;
-     while ( itr.hasNext())
+     Iterator iterator = items.iterator();
+     Item item;
+     while ( iterator.hasNext())
      {
-       itm =  (Item) itr.next();
-       if ( itm.getIsbn().equals(isbn))
+       item =  (Item) iterator.next();
+       if ( item.getIsbn().equals(isbn))
        {
-          return itm;
+          return item;
        }
      }  // end of while
 
@@ -33,7 +33,7 @@ public class Cart
    }
    
    // adds an item if not already existing
-  // otherwise add 1 to qty
+  // otherwise add 1 to quantity
    public void addItem(String isbn )
    {
      //check whether isbn is already present
@@ -46,17 +46,17 @@ public class Cart
 
          User  user  = new User();
          try (Connection con = user.getConnection()) {
-             PreparedStatement ps = con.prepareStatement("select title,price from books where isbn = ? ");
-             ps.setString(1, isbn);
+             PreparedStatement prepStatement = con.prepareStatement("select title,price from books where isbn = ? ");
+             prepStatement.setString(1, isbn);
 
-             ResultSet rs = ps.executeQuery();
-             if (rs.next()) {
-                 item = new Item(isbn, rs.getString(1), rs.getInt(2));
+             ResultSet results = prepStatement.executeQuery();
+             if (results.next()) {
+                 item = new Item(isbn, results.getString(1), results.getInt(2));
                  items.add(item);
              }
 
-             rs.close();
-             ps.close();
+             results.close();
+             prepStatement.close();
 
          } catch (Exception ex) {
              System.out.println(ex.getMessage());
@@ -79,15 +79,15 @@ public class Cart
        items.clear();
    }
 
-   public void updateQty(String isbn, int qty)
+   public void updateQty(String isbn, int quantity)
    {
         Item  item = find(isbn);
         if ( item != null)
-          item.setQty(qty);
+          item.setQty(quantity);
    } // end of updateQty()
 
 
-  public boolean finalizeOrder(int userid,int total) 
+  public boolean finalizeOrder(int userid,int total)
   {
      
 	  try {
@@ -103,8 +103,8 @@ public class Cart
 			String pass="SQLDEVSERVER";
 			Connection con=DriverManager.getConnection(url,user,pass);
 			String sql="INSERT INTO `orders` (`ordid`, `userid`, `orddate`, `totamt`, `status`, `isbn`) VALUES (NULL, '"+userid+"', '"+now+"', '"+total+"', 'a', '2')";
-			Statement stmt=con.createStatement();
-			stmt.executeUpdate(sql);
+			Statement statement=con.createStatement();
+			statement.executeUpdate(sql);
 			con.close();
 			System.out.println("Record inserted");
 			
@@ -126,10 +126,10 @@ public class Cart
      
    try
    {
-      Context ctx = getInitialContext();  
+      Context context = getInitialContext();
       // get access to bean
 
-      OrderHome home = (OrderHome)  ctx.lookup("obs.order");
+      OrderHome home = (OrderHome)  context.lookup("obs.order");
       Order order = home.create();
 
       return order.cancelOrder(ordid);

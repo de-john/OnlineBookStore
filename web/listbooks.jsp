@@ -23,29 +23,29 @@
             cond = "1 = 1";
 
         Connection con = user.getConnection();
-        Statement st = con.createStatement();
+        Statement statement = con.createStatement();
 
-        ResultSet rs = st.executeQuery("select isbn, title, author, pub, cat, price from books where " + cond);
+        ResultSet results = statement.executeQuery("select isbn, title, author, pub, cat, price from books where " + cond);
 
-        while (rs.next()) {
+        while (results.next()) {
 
     %>
     <tr>
         <td>
-            <a href=addbook.jsp?isbn=<%=rs.getString("isbn")%>>Add TO Cart </a>
-        <td><%=rs.getInt(1)%>
-        <td><%=rs.getString(2)%>
-        <td><%=rs.getString(3)%>
-        <td><%=rs.getString(4)%>
+            <a href=addbook.jsp?isbn=<%=results.getString("isbn")%>>Add TO Cart </a>
+        <td><%=results.getInt(1)%>
+        <td><%=results.getString(2)%>
+        <td><%=results.getString(3)%>
+        <td><%=results.getString(4)%>
 
-        <td><%=rs.getString(5)%>
-        <td><%=rs.getInt(6)%>
+        <td><%=results.getString(5)%>
+        <td><%=results.getInt(6)%>
     </tr>
 
     <%
         }
-        rs.close();
-        st.close();
+        results.close();
+        statement.close();
         con.close();
     %>
 

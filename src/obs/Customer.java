@@ -17,16 +17,16 @@ public class Customer
     private  String email;
     private  String phoneno;
 
-    private  Context ctx;
+    private  Context context;
 
     public Context getJNDIContext()
     { 
-       return  ctx;
+       return  this.context;
     }
 
     public Customer() 
     {
-       ctx = getInitialContext();
+       this.context = getInitialContext();
     }
 
     public  void setCustname(String custname)
@@ -46,7 +46,7 @@ public class Customer
     { this.password= password; }
 
     public String getPassword()
-    {  return password; }
+    {  return this.password; }
 
     public  void setEmail (String email)
     { this.email = email; }
@@ -58,20 +58,20 @@ public class Customer
     public  boolean isValid()
     {
      Connection con = null;
-     PreparedStatement ps = null;
+     PreparedStatement prepStatement = null;
      try
      {
       con = getConnection();
-      ps = con.prepareStatement("select phoneno, email from customers where custname = ? and pwd= ?");
-      ps.setString(1,custname);
-      ps.setString(2,password);
+      prepStatement = con.prepareStatement("select phoneno, email from customers where custname = ? and pwd= ?");
+      prepStatement.setString(1,custname);
+      prepStatement.setString(2,password);
 
-      ResultSet rs = ps.executeQuery();
+      ResultSet results = prepStatement.executeQuery();
       boolean found = false;
 
-      if ( rs.next())
-     {     phoneno = rs.getString("phoneno");
-           email = rs.getString("email");
+      if ( results.next())
+     {     phoneno = results.getString("phoneno");
+           email = results.getString("email");
            found = true;
      }
      return found;
@@ -83,7 +83,7 @@ public class Customer
    }
    finally
   {
-       clean(con,ps);
+       clean(con,prepStatement);
   } 
 
  } // end of isValid
@@ -91,16 +91,16 @@ public class Customer
  public String updatePassword(String newpassword) 
  {
    Connection con = null;
-   PreparedStatement ps= null;
+   PreparedStatement prepStatement= null;
 
    try
    {
      con = getConnection();
-     ps = con.prepareStatement("update customers set pwd = ? where custname = ?");
-     ps.setString(1,newpassword);
-     ps.setString(2,custname);
+     prepStatement = con.prepareStatement("update customers set pwd = ? where custname = ?");
+     prepStatement.setString(1,newpassword);
+     prepStatement.setString(2,custname);
 
-     int cnt = ps.executeUpdate();
+     int cnt = prepStatement.executeUpdate();
      if ( cnt==1 ) 
         return null;
      else
@@ -114,7 +114,7 @@ public class Customer
   }
   finally
   {
-       clean(con,ps);
+       clean(con,prepStatement);
   } 
 
  } // end of updatePassword
@@ -122,17 +122,17 @@ public class Customer
  public String  registerUser()
  {
     Connection con = null;
-    PreparedStatement ps = null;
+    PreparedStatement prepStatement = null;
 
     try
     {
         con = getConnection();
-        ps = con.prepareStatement("insert into customers values (?,?,?,?)");
-        ps.setString(1,custname);
-        ps.setString(2,password);
-        ps.setString(3,email);
-        ps.setString(4,phoneno);
-        ps.executeUpdate();
+        prepStatement = con.prepareStatement("insert into customers values (?,?,?,?)");
+        prepStatement.setString(1,custname);
+        prepStatement.setString(2,password);
+        prepStatement.setString(3,email);
+        prepStatement.setString(4,phoneno);
+        prepStatement.executeUpdate();
         return null;
 
     }
@@ -141,16 +141,16 @@ public class Customer
        return ex.getMessage();
     }
     finally
-    {  clean(con,ps); }
+    {  clean(con,prepStatement); }
  }
 
         
 
 
- public  void clean(Connection con, PreparedStatement ps)
+ public  void clean(Connection con, PreparedStatement prepStatement)
  { 
    try
-   { if ( ps != null )  ps.close();
+   { if ( prepStatement != null )  prepStatement.close();
      if ( con != null) con.close();
     }
     catch(Exception ex)
